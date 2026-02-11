@@ -1,4 +1,4 @@
-# Scalable WordPress Deployment on Kubernetes 🚀
+# WordPress Deployment on Kubernetes 🚀
 
 ## Project Overview 📋
 This project executes a migration of a WordPress application from a Docker-Compose environment to a Kubernetes cluster. The primary goal was to enhance scalability, reliability, and manageability by leveraging Kubernetes orchestration, Helm package management, and AWS ECR for container storage.
