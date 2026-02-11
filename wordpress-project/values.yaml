@@ -1,0 +1,18 @@
+# values.yaml
+wordpress:
+  image:
+    repository: 992382545251.dkr.ecr.us-east-1.amazonaws.com/nadav-project/wordpress
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  replicas: 2
+  servicePort: 80
+
+mysql:
+  image:
+    repository: 992382545251.dkr.ecr.us-east-1.amazonaws.com/nadav-project/mariadb
+    tag: "10.6.4-focal"
+    pullPolicy: IfNotPresent
+  dbName: wordpress
+  storageSize: 1Gi
+  existingSecret: "mysql-pass"
+  secretKey: "password"
