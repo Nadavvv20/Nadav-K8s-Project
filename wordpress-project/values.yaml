@@ -15,4 +15,4 @@ mysql:
   dbName: wordpress
   storageSize: 1Gi
   existingSecret: "mysql-pass"
-  secretKey: "password"
+  secretKey: "PLEASE_CHANGE_ME!"
