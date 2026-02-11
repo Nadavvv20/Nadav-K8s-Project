@@ -40,10 +40,13 @@ helm install my-ingress ingress-nginx/ingress-nginx --namespace ingress-nginx --
 ```
 
 ### Application Deployment using helm
-Finnaly, I deployed the custom Helm chart. This single command is initiating all resources defined in the package structure, including 2 replicas of the wordpress pod.
+Finally, I deployed the custom Helm chart. This single command is initiating all resources defined in the package structure, including 2 replicas of the wordpress pod.
+Example:
 ```bash
-helm install nadav-wordpress ./wordpress-project
+helm helm install nadav-wordpress ./wordpress-project --set mysql.rootPassword=MySecurePassword123
 ```
+> [!NOTE]
+> The user may use the ```--set``` flag to innject the password, or alternively update the values.yaml mannualy.
 
 ### Access
 Executed the port-forwarding automation script to expose the application:
