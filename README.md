@@ -63,3 +63,5 @@ To uninstall the release and free up resources:
 helm uninstall nadav-wordpress
 minikube delete
 ```
+
+![Nadav WordPress Kubernetes Architecture](Screenshots/k8s-project.jpg)
