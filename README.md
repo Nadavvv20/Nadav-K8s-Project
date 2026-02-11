@@ -57,12 +57,6 @@ Executed the port-forwarding automation script to expose the application:
     *   **Query**: `time()-kube_pod_start_time{namespace="default", pod=~"wordpress.*"}`
     *   **Purpose**: Visualizes the uptime duration of the WordPress pods since their last start.
 
-## Definition of Done Verification ✅
-The project meets the following criteria:
-*   [x] **Reachability**: Application is successfully reachable via the Ingress hostname/localhost mapped port.
-*   [x] **Persistence**: Database data survives pod restarts, guaranteed by the implementation of **StatefulSets** and **Persistent Volume Claims (PVC)**.
-*   [x] **Versioning**: The entire infrastructure configuration is versioned in Git and packaged via **Helm**.
-
 ## Cleanup 🧹
 To uninstall the release and free up resources:
 ```bash
