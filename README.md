@@ -1,126 +1,75 @@
 # Scalable WordPress Deployment on Kubernetes 🚀
 
 ## 1. Project Overview 📋
+This project executes a robust migration of a WordPress application from a Docker-Compose environment to a production-ready Kubernetes cluster. The primary goal was to enhance scalability, reliability, and manageability by leveraging Kubernetes orchestration, Helm package management, and AWS ECR for container storage.
 
-### Purpose
-The goal of this project is to migrate a WordPress application from a Docker-Compose setup to a production-ready Kubernetes environment. This transition enhances scalability, reliability, and manageability of the application.
+## 2. Containerization Lifecycle 📦
+The migration began with preparing the container images for the cloud environment:
+1.  **Build & Tag**:
+    *   Pulled the official WordPress and MySQL images.
+    *   Tagged them specifically for the Amazon Elastic Container Registry (ECR) target repositories (e.g., `nadav-project/wordpress`, `nadav-project/mariadb`).
+2.  **Registry Push**:
+    *   Authenticated the local Docker client with AWS ECR using `aws ecr get-login-password`.
+    *   Pushed the tagged images to the private ECR repositories to ensure secure and reliable image availability for the cluster.
 
-### Core Components
-*   **WordPress**: The core content management system.
-*   **MySQL**: Relational database for storing WordPress data.
-*   **NGINX Ingress**: Manages external access to the services in the cluster.
-*   **Prometheus-Grafana Stack**: Provides comprehensive monitoring and visualization.
+## 3. Helm Package Structure 📂
+The application is packaged as a unified Helm chart for consistent deployment:
 
-## 2. Architecture Design 🏗️
-
-### Infrastructural Layout
-Traffic enters the cluster through the **NGINX Ingress Controller**, which routes HTTP requests to the `wordpress` service. 
-
-**Why NGINX Ingress?**
-The Ingress Controller is a critical component that acts as the single entry point for all external traffic entering the cluster. Unlike simple NodePort services, it provides a production-grade routing layer that:
-*   **Centralizes Access**: Eliminates the need to expose a separate LoadBalancer or NodePort for every service.
-*   **Efficient Routing**: Intelligently routes HTTP/HTTPS traffic to the correct internal pods based on hostnames or paths.
-*   **Scalability**: Decouples the routing configuration from the application logic, making it easier to scale and manage multiple services.
-
-### Persistence Layer
-To ensure data reliability and persistence, the database utilizes:
-*   **StatefulSets**: Guarantees the deployment order and uniqueness of the MySQL pod.
-*   **Persistent Volume Claims (PVC)**: `mysql-persistent-storage` creates a persistent volume to store database data, ensuring it survives pod restarts.
-
-### Networking
-*   **Dynamic Site URL**: The WordPress configuration (`wp-config.php`) is dynamically updated using environment variables (`WORDPRESS_CONFIG_EXTRA`) to set `WP_HOME` and `WP_SITEURL` based on the incoming `HTTP_HOST`. This allows the site to work correctly under port-forwarding (e.g., `localhost:8080`).
-*   **Internal Communication**: Services communicate via internal DNS names (e.g., `wordpress-db` for the database).
-
-## 3. Prerequisites 🛠️
-
-### Environment
-*   **EC2 Instance**: Managing a Minikube cluster.
-*   **Minikube**: A local Kubernetes tool for learning and developing.
-
-### Tools
-Ensure you have the following installed:
-*   `kubectl`
-*   `helm`
-*   `aws-cli`
-
-### Access
-*   **AWS ECR**: An IAM role with permissions to pull images from Amazon ECR must be attached to the EC2 instance.
-
-### Minikube Addons
-*   **registry-creds**: This addon must be enabled to handle ECR authentication automatically.
-    ```bash
-    minikube addons enable registry-creds
-    ```
-
-## 4. Installation & Deployment 🚀
-
-### Repository Setup
-Clone the repository to your local machine:
-```bash
-git clone <repository-url>
-cd <repository-folder>
+```text
+wordpress-project/
+├── Chart.yaml                  # Chart metadata and versioning
+├── values.yaml                 # Configuration defaults (image refs, replicas, ports)
+└── templates/
+    ├── ingress.yaml            # Ingress rules for external access
+    ├── mysql-statefulset.yaml  # StatefulSet for database consistency
+    ├── secret.yaml             # Encoded secrets for DB credentials
+    └── wordpress_deployment.yaml # Deployment logic for the WordPress app
 ```
 
-### Secrets Management
-*   **DB Credentials**: Managed via the `templates/secret.yaml` file in the Helm chart, ensuring secure password injection into both WordPress and MySQL components.
-*   **ECR Pull Secrets**: Handled automatically by the `registry-creds` addon.
+## 4. Infrastructure & Automation 🏗️
+*   **Minikube Addons**: Utilized the `registry-creds` addon (`minikube addons enable registry-creds`) to automate the retrieval and renewal of AWS ECR credentials, allowing the cluster to pull private images seamlessly without manual secret rotation.
+*   **Helm Orchestration**: The entire stack—including the application, database, ingress rules, and secrets—is managed as a single atomic Helm release (`wordpress-release`).
+*   **Port-Forwarding Strategy**: To bridge the gap between the EC2/Minikube isolated network and the user, custom scripts in the `bin/` directory manage port forwarding background processes, mapping local ports to Ingress/Service ports (8080 -> 80, 3000 -> Grafana).
 
-### Ingress Controller Setup
-Before deploying the application stack, you must install the NGINX Ingress Controller using Helm. This controller will manage the external access to your services.
+## 5. Deployment Workflow 🚀
 
+### Prerequisites
+*   Kubernetes Cluster (Minikube on EC2)
+*   Tools: `kubectl`, `helm`, `aws-cli`
+
+### Step 1: Ingress Controller
+Installed the NGINX Ingress Controller to manage external access. This was preferred over simple NodePorts to simulate a production-grade routing layer.
 ```bash
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-helm repo update
 helm install my-ingress ingress-nginx/ingress-nginx --namespace ingress-nginx --create-namespace
 ```
 
-### Helm Deployment
-Deploy the entire stack using the custom Helm chart:
+### Step 2: Application Deployment
+Deployed the custom Helm chart. This single command instantiates all resources defined in the package structure.
 ```bash
 helm install wordpress-release ./wordpress-project
 ```
 
-## 5. Accessing the Application 🌐
+### Step 3: Access
+Executed the port-forwarding automation script to expose the application:
+```bash
+./bin/port-forwardings.sh
+```
 
-### Ingress Configuration
-The application is exposed via the NGINX Ingress Controller. You can access it by mapping your local hostname or using the provided automation scripts.
+## 6. Observability Implementation 📊
+*   **Monitoring Stack**: Deployed the **kube-prometheus-stack** to provide a complete monitoring solution (Prometheus, Grafana, Alertmanager).
+*   **Uptime Logic**: Created a dedicated **Uptime Panel** in Grafana.
+    *   **Metric**: `up` (tracks the instance availability).
+    *   **Visualization**: **State Timeline** to visualize the exact periods of service availability and downtime for both WordPress and MySQL containers.
 
-### Automation Scripts
-The `bin/` directory contains helper scripts to streamline access:
+## 7. Definition of Done Verification ✅
+The project meets the following criteria:
+*   [x] **Reachability**: Application is successfully reachable via the Ingress hostname/localhost mapped port.
+*   [x] **Persistence**: Database data survives pod restarts, guaranteed by the implementation of **StatefulSets** and **Persistent Volume Claims (PVC)**.
+*   [x] **Versioning**: The entire infrastructure configuration is versioned in Git and packaged via **Helm**.
 
-*   **Start Minikube**:
-    ```bash
-    ./bin/run_minikube.sh
-    ```
-    Starts Minikube with the Docker driver and optimized resources (12GB RAM, 3 CPUs).
-
-*   **Port Forwarding**:
-    ```bash
-    ./bin/port-forwardings.sh
-    ```
-    Establishes port-forwarding for:
-    *   **WordPress**: `http://<EC2_IP>:8080` (mapped to Ingress port 80)
-    *   **Grafana**: `http://<EC2_IP>:3000`
-    *   **Prometheus**: `http://<EC2_IP>:9090`
-
-## 6. Monitoring & Observability 📊
-
-### Stack Overview
-The project integrates with the **kube-prometheus-stack** to collect metrics from the cluster and applications.
-
-### Custom Metrics
-A custom **Uptime Panel** has been configured in Grafana to monitor the health and uptime of the WordPress and MySQL containers.
-
-### Usage
-1.  Run the port-forwarding script.
-2.  Open your browser to `http://<EC2_IP>:3000`.
-3.  Log in with the default credentials (usually `admin` / `prom-operator` or check your specific setup).
-
-## 7. Cleanup 🧹
-
-### Teardown
-To remove the release and delete resources:
-
+## 8. Cleanup 🧹
+To uninstall the release and free up resources:
 ```bash
 helm uninstall wordpress-release
 minikube delete
