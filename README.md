@@ -33,6 +33,7 @@ wordpress-project/
 
 ## 5. Deployment Workflow 🚀
 
+### Prerequisites
 *   Kubernetes Cluster (Minikube on EC2)
 *   Tools: `kubectl`, `helm`, `aws-cli`
 
@@ -44,7 +45,7 @@ helm install my-ingress ingress-nginx/ingress-nginx --namespace ingress-nginx --
 ```
 
 ### Step 2: Application Deployment
-Deployed the custom Helm chart. This single command instantiates all resources defined in the package structure, including 2 replicas of the wordpress pod.
+Deployed the custom Helm chart. This single command instantiates all resources defined in the package structure.
 ```bash
 helm install wordpress-release ./wordpress-project
 ```

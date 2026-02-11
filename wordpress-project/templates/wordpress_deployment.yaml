@@ -63,6 +63,13 @@ spec:
             define('WP_SITEURL', 'http://' . $_SERVER['HTTP_HOST']);
         ports:
         - containerPort: {{ .Values.wordpress.servicePort }}
+        volumeMounts:
+        - name: wordpress-persistent-storage
+          mountPath: /var/www/html
+      volumes:
+      - name: wordpress-persistent-storage
+        persistentVolumeClaim:
+          claimName: wp-pv-claim
 
 
 
