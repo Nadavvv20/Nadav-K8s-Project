@@ -45,7 +45,7 @@ Example:
 ```bash
 helm helm install nadav-wordpress ./wordpress-project --set mysql.rootPassword=MySecurePassword123
 ```
-> [IMPORTANT]
+> [!IMPORTANT]
 > The user should use the ```--set```, this action will "run over" the password used inside values.yaml, this grants more security.
 
 ### Access
