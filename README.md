@@ -57,10 +57,9 @@ Executed the port-forwarding automation script to expose the application:
 
 ## 6. Observability Implementation 📊
 *   **Monitoring Stack**: Deployed the **kube-prometheus-stack** to provide a complete monitoring solution (Prometheus, Grafana, Alertmanager).
-*   **Custom Dashboards**: Imported the [Kubernetes Pod Monitoring](https://grafana.com/grafana/dashboards/9144-kubernetes-pod-monitoring/) dashboard (ID: 9144) by downloading its JSON configuration and importing it directly into Grafana to visualize pod metrics.
-*   **Uptime Logic**: Created a dedicated **Uptime Panel** in Grafana.
-    *   **Metric**: `up` (tracks the instance availability).
-    *   **Visualization**: **State Timeline** to visualize the exact periods of service availability and downtime for both WordPress and MySQL containers.
+*   **Uptime Monitoring**: Configured a custom **Uptime Panel** in Grafana to track the duration of pod operation.
+    *   **Query**: `time()-kube_pod_start_time{namespace="default", pod=~"wordpress.*"}`
+    *   **Purpose**: Visualizes the uptime duration of the WordPress pods since their last start.
 
 ## 7. Definition of Done Verification ✅
 The project meets the following criteria:
