@@ -46,7 +46,7 @@ Example:
 helm helm install nadav-wordpress ./wordpress-project --set mysql.rootPassword=MySecurePassword123
 ```
 > [!NOTE]
-> The user may use the ```--set``` flag to innject the password, or alternively update the values.yaml mannualy.
+> The user may use the ```--set``` flag to inject the password, or alternatively update the values.yaml manually.
 
 ### Access
 Executed the port-forwarding automation script to expose the application:
