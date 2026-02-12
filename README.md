@@ -86,4 +86,4 @@ helm uninstall nadav-wordpress
 minikube delete
 ```
 
-![Nadav WordPress Kubernetes Architecture](Screenshots/k8s-project.jpg)
+![Nadav WordPress Kubernetes Architecture](Screenshots/WordPress_on_K8s.png)
