@@ -39,17 +39,36 @@ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm install my-ingress ingress-nginx/ingress-nginx --namespace ingress-nginx --create-namespace
 ```
 
-### Application Deployment using helm
-Finally, I deployed the custom Helm chart. This single command is initiating all resources defined in the package structure, including 2 replicas of the wordpress pod.
-Example:
+### Application Deployment 🚀
+Instead of manually running Helm commands and exposing secrets, I used an automated deployment script `deploy.sh`.
+
+#### AWS Systems Manager (SSM) Parameter Store Integration 🔐
+I used **AWS Parameter Store** to securely manage sensitive configuration data, such as database passwords.
+
+**Why use AWS Parameter Store?**
+*   **Security**: Eliminates the risk of hardcoding sensitive credentials in source code or configuration files.
+*   **Centralized Management**: Provides a single source of truth for configuration data across different environments.
+*   **Auditability**: AWS CloudTrail logs all access to parameters, providing a clear audit trail of who accessed what and when.
+*   **Separation of Concerns**: Developers can write code without needing to know production secrets.
+
+**How it works in this project:**
+1.  The database password is stored as a **SecureString** in AWS Parameter Store under the name `Nadav-db-secret`.
+2.  The `deploy.sh` script authenticates with AWS and retrieves this secret at runtime.
+3.  The secret is dynamically injected into the Helm chart using the `--set` flag during deployment effectively keeping it out of the codebase.
+
+#### deploy.sh Execution 
+The deployment script performs the following actions:
+1.  Fetches the DB password from AWS SSM Parameter Store.
+2.  Validates that the password was retrieved successfully.
+3.  Executes `helm upgrade --install` to deploy/update the application, passing the retrieved password securely.
+
+To deploy the application:
 ```bash
-helm install nadav-wordpress ./wordpress-project --set mysql.rootPassword=MySecurePassword123
+./deploy.sh
 ```
-> [!IMPORTANT]
-> The user should use the ```--set```, this action will "run over" the password used inside values.yaml, this grants more security.
 
 ### Access
-Executed the port-forwarding automation script to expose the application:
+Execute the port-forwarding automation script to expose the application:
 ```bash
 ./bin/port-forwardings.sh
 ```
