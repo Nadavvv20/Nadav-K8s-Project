@@ -38,7 +38,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: mysql-pass
-              key: password
+              key: {{ .Values.mysql.secretKey }}
         - name: MYSQL_DATABASE
           value: wordpress
         - name: MYSQL_USER
@@ -47,7 +47,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: mysql-pass
-              key: password
+              key: {{ .Values.mysql.secretKey }}
         ports:
         - containerPort: 3306
           name: mysql

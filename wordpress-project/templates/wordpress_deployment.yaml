@@ -12,19 +12,6 @@ spec:
     app: wordpress
   type: ClusterIP
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: wp-pv-claim
-  labels:
-    app: wordpress
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 2Gi
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -54,7 +41,9 @@ spec:
           valueFrom:
             secretKeyRef:
               name: mysql-pass
-              key: password
+              key: {{ .Values.mysql.secretKey }}
+        - name: WORDPRESS_DB_NAME
+          value: wordpress
         - name: WORDPRESS_DB_USER
           value: wordpress
         - name: WORDPRESS_CONFIG_EXTRA
