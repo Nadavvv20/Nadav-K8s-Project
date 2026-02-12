@@ -10,7 +10,6 @@ echo "Fetching DB password from AWS Parameter Store..."
 DB_PASS=$(aws ssm get-parameter --name "$PARAMETER_NAME" \
 --with-decryption --query "Parameter.Value" --output text --region "$REGION")
 
-echo "DEBUG: The password fetched from AWS is: $DB_PASS"
 
 if [ -z "$DB_PASS" ]; then
   echo "Error: Could not fetch password from AWS!"
