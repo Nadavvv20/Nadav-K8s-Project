@@ -12,7 +12,8 @@ mysql:
     repository: 992382545251.dkr.ecr.us-east-1.amazonaws.com/nadav-project/mariadb
     tag: "10.6.4-focal"
     pullPolicy: IfNotPresent
-  dbName: wordpress
+  dbName: "wordpress-db"
+  rootPassword: "" # DO NOT ENTER PASSWORD HERE! Use AWS Parameter Store.
   storageSize: 1Gi
   existingSecret: "mysql-pass"
-  secretKey: "PLEASE_CHANGE_ME!"
+  secretKey: "password"
